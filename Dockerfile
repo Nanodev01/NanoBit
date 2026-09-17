@@ -47,6 +47,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
+# Copy dependencies needed for standalone scripts (seed, etc)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/bcryptjs ./node_modules/bcryptjs
+
 # Ensure the SQLite DB directory has permissions if mounted
 USER nextjs
 
