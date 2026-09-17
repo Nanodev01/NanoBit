@@ -10,7 +10,7 @@ interface AboutPhotoProps {
 }
 
 export function AboutPhoto({
-  imageSrc = "/me.png",
+  imageSrc,
   alt = "Nanodev - Software Programmer & Cybersecurity",
 }: AboutPhotoProps) {
   const [imgError, setImgError] = useState(false);
@@ -28,7 +28,7 @@ export function AboutPhoto({
         <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-cyan-400/70" />
         <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-cyan-400/70" />
 
-        {!imgError ? (
+        {imageSrc && !imgError ? (
           <Image
             src={imageSrc}
             alt={alt}
