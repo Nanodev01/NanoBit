@@ -13,6 +13,7 @@ services:
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET}
       - DATABASE_URL=${DATABASE_URL:-file:./dev.db}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - nanobit-db:/app/prisma
 
