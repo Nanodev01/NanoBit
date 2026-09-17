@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛡️ nanobit.me | Software Engineer & Cybersecurity Portfolio
 
-## Getting Started
+Un portfolio web altamente seguro, interactivo y enfocado al rendimiento, diseñado para reflejar la intersección entre el Desarrollo de Software (Ingeniería) y la Ciberseguridad.
 
-First, run the development server:
+## 🚀 Tecnologías Principales
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Frontend:** Next.js 15 (App Router), React 19
+- **Estilos:** Tailwind CSS v4, Shadcn UI
+- **Animaciones:** Framer Motion
+- **Backend & API:** Rutas API nativas de Next.js
+- **Base de Datos:** SQLite gestionado con Prisma ORM
+- **Seguridad:** Autenticación por JWT (HttpOnly Cookies), Encriptación de claves con bcryptjs.
+- **Despliegue:** Preparado para Docker y Coolify (Standalone Mode).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚡ Características
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Diseño "Enterprise Security":** Modo oscuro por defecto con acentos cyan. Interfaz sobria, minimalista y libre de distracciones.
+- **Componentes Tecnológicos:** Hero simulando una terminal (Boot/Init system) con el estado real de Uptime de los servidores.
+- **Centro de Comando (Admin Panel):** Rutas protegidas por Middleware bajo `/admin` que permiten gestionar de manera integral el sitio web sin tocar una sola línea de código:
+  - Leer y eliminar mensajes recibidos del formulario público.
+  - Editar dinámicamente la sección "Sobre mí".
+  - Crear y actualizar Proyectos (con soporte para tags).
+  - Gestionar el Blog con soporte completo para **Markdown**.
+- **SEO Ready:** Al utilizar Server Components, los proyectos y entradas del blog se renderizan del lado del servidor para máxima indexación.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Instalación y Desarrollo Local
 
-## Learn More
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/tu-usuario/nanobit-portfolio.git
+   cd nanobit-portfolio
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Configura tus variables de entorno. Crea un archivo `.env` en la raíz basado en el siguiente formato:
+   ```env
+   JWT_SECRET="tu_secreto_super_seguro_para_jwt"
+   DATABASE_URL="file:./dev.db"
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Sincroniza la base de datos y crea un administrador inicial:
+   ```bash
+   npx prisma db push
+   node prisma/seed.js
+   ```
 
-## Deploy on Vercel
+5. Inicia el servidor de desarrollo:
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Visita `http://localhost:3000` para ver la web y `http://localhost:3000/admin` para entrar a tu Centro de Comando.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🐳 Despliegue con Docker (Coolify)
+
+El proyecto incluye un `Dockerfile` optimizado (multistage) para exportar el proyecto en formato standalone, reduciendo la imagen drásticamente.
+
+El `docker-compose.yml` incluido levanta el servicio mapeando tu base de datos SQLite como un volumen persistente, por lo que las actualizaciones o reinicios en Coolify no eliminarán tus posts ni configuraciones.
+
+## 📄 Licencia
+
+Este proyecto es de código abierto y está disponible bajo la [Licencia MIT](LICENSE). Siéntete libre de clonarlo y adaptarlo a tus necesidades.

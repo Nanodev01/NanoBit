@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  nanobit-portfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nanobit-portfolio
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-super_secret_jwt_key_nanobit_2026}
+      - DATABASE_URL=file:/app/prisma/dev.db
+    volumes:
+      # Montamos el archivo SQLite para que persista entre reinicios y actualizaciones
+      - nanobit-db:/app/prisma
+
+volumes:
+  nanobit-db:
+    name: nanobit_db_data
