@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { sendDiscordNotification } from '@/lib/discord';
 
 export async function POST(request: Request) {
   try {
@@ -16,6 +17,14 @@ export async function POST(request: Request) {
         content,
       },
     });
+
+    // Disparar alerta en tiempo real a Discord sin bloquear la respuesta si falla
+    sendDiscordNotification({
+      name,
+      email,
+      content,
+      source: "web_form",
+    }).catch((err) => console.error("Discord notification error:", err));
 
     return NextResponse.json({ success: true, message: 'Mensaje enviado correctamente' }, { status: 201 });
   } catch (error) {

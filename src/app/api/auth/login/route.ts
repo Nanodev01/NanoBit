@@ -11,8 +11,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faltan credenciales' }, { status: 400 });
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (!user) {

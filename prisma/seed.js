@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@nanobit.me';
+  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@nanobit.me').toLowerCase().trim();
   const adminPassword = process.env.ADMIN_PASSWORD;
 
   if (!adminPassword) {
