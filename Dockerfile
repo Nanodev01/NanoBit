@@ -16,6 +16,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate prisma client and build the app
+# Create a dummy database for Next.js Static Site Generation during build
+ENV DATABASE_URL="file:/app/prisma/dev.db"
+RUN npx prisma db push
 RUN npx prisma generate
 RUN npm run build
 
