@@ -124,6 +124,28 @@ export async function deleteMessage(id: string) {
   }
 }
 
+async function saveUploadedFile(file: File | null, subfolder: string): Promise<string | null> {
+  if (!file || file.size === 0 || typeof file.arrayBuffer !== "function") {
+    return null;
+  }
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const uploadDir = path.join(process.cwd(), "public", "uploads", subfolder);
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    const safeName = file.name.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
+    const filename = `${Date.now()}-${safeName}`;
+    const fullPath = path.join(uploadDir, filename);
+
+    await fs.writeFile(fullPath, buffer);
+    return `/uploads/${subfolder}/${filename}`;
+  } catch (err) {
+    console.error(`Error al guardar archivo en ${subfolder}:`, err);
+    return null;
+  }
+}
+
 // --- PROYECTOS ---
 export async function createProject(formData: FormData) {
   try {
@@ -140,18 +162,45 @@ export async function createProject(formData: FormData) {
       return { error: "Título y descripción son obligatorios" };
     }
 
+    let finalImageUrl = (formData.get("imageUrl") as string)?.trim() || null;
+    const imageFile = formData.get("imageFile") as File | null;
+    const uploadedImageUrl = await saveUploadedFile(imageFile, "projects");
+    if (uploadedImageUrl) finalImageUrl = uploadedImageUrl;
+
+    let finalGifUrl = (formData.get("gifUrl") as string)?.trim() || null;
+    const gifFile = formData.get("gifFile") as File | null;
+    const uploadedGifUrl = await saveUploadedFile(gifFile, "projects");
+    if (uploadedGifUrl) finalGifUrl = uploadedGifUrl;
+
     const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
 
-    await prisma.project.create({
-      data: {
-        title,
-        description,
-        url,
-        repoUrl,
-        published,
-        tags: JSON.stringify(tagsArray)
-      }
-    });
+    try {
+      await (prisma.project as any).create({
+        data: {
+          title,
+          description,
+          url,
+          repoUrl,
+          imageUrl: finalImageUrl,
+          gifUrl: finalGifUrl,
+          published,
+          tags: JSON.stringify(tagsArray)
+        }
+      });
+    } catch (clientErr: any) {
+      console.warn("Prisma Client validation failed for Project, using direct SQLite fallback:", clientErr?.message);
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Project" ADD COLUMN "imageUrl" TEXT;`);
+      } catch {}
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Project" ADD COLUMN "gifUrl" TEXT;`);
+      } catch {}
+      const newId = crypto.randomUUID();
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO "Project" ("id", "title", "description", "url", "repoUrl", "imageUrl", "gifUrl", "tags", "published", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        newId, title, description, url, repoUrl, finalImageUrl, finalGifUrl, JSON.stringify(tagsArray), published ? 1 : 0
+      );
+    }
 
     revalidatePath("/admin/dashboard/projects");
     revalidatePath("/");
@@ -183,7 +232,11 @@ export async function createPost(formData: FormData) {
     const title = (formData.get("title") as string)?.trim();
     const content = (formData.get("content") as string)?.trim();
     const type = (formData.get("type") as string) || "blog";
-    const imageUrl = (formData.get("imageUrl") as string)?.trim() || null;
+    let finalImageUrl = (formData.get("imageUrl") as string)?.trim() || null;
+    const file = formData.get("file") as File | null;
+    const uploadedImageUrl = await saveUploadedFile(file, "posts");
+    if (uploadedImageUrl) finalImageUrl = uploadedImageUrl;
+
     const published = formData.get("published") === "on";
     
     if (!title || !content) {
@@ -200,7 +253,7 @@ export async function createPost(formData: FormData) {
           slug,
           content,
           type,
-          imageUrl,
+          imageUrl: finalImageUrl,
           published
         }
       });
@@ -212,7 +265,7 @@ export async function createPost(formData: FormData) {
       const newId = crypto.randomUUID();
       await prisma.$executeRawUnsafe(
         `INSERT INTO "Post" ("id", "title", "slug", "content", "type", "imageUrl", "published", "createdAt", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-        newId, title, slug, content, type, imageUrl, published ? 1 : 0
+        newId, title, slug, content, type, finalImageUrl, published ? 1 : 0
       );
     }
 
@@ -256,27 +309,9 @@ export async function createPhoto(formData: FormData) {
 
     let finalImageUrl = (formData.get("imageUrl") as string)?.trim() || "";
 
-    // Procesar archivo subido localmente si existe
     const file = formData.get("file") as File | null;
-    if (file && file.size > 0 && typeof file.arrayBuffer === "function") {
-      try {
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "photos");
-        await fs.mkdir(uploadDir, { recursive: true });
-
-        const safeName = file.name.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
-        const filename = `${Date.now()}-${safeName}`;
-        const fullPath = path.join(uploadDir, filename);
-
-        await fs.writeFile(fullPath, buffer);
-        finalImageUrl = `/uploads/photos/${filename}`;
-      } catch (err) {
-        console.error("Error al guardar archivo en disco:", err);
-        return { error: "Error al guardar el archivo en el servidor" };
-      }
-    }
+    const uploaded = await saveUploadedFile(file, "photos");
+    if (uploaded) finalImageUrl = uploaded;
 
     if (!finalImageUrl) {
       return { error: "Debes subir una foto o ingresar una URL de imagen válida" };

@@ -57,4 +57,4 @@ COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "chmod 777 ./prisma 2>/dev/null || true; cp -f /app/prisma-src/schema.prisma ./prisma/schema.prisma 2>/dev/null || true; cp -f /app/prisma-src/seed.js ./prisma/seed.js 2>/dev/null || true; chmod 777 ./prisma/* 2>/dev/null || true; npx prisma generate && npx prisma db push --accept-data-loss && (if [ -n \"$ADMIN_PASSWORD\" ]; then node prisma/seed.js || true; fi) && node server.js"]
+CMD ["sh", "-c", "chmod 777 ./prisma 2>/dev/null || true; cp -f /app/prisma-src/schema.prisma ./prisma/schema.prisma 2>/dev/null || true; cp -f /app/prisma-src/seed.js ./prisma/seed.js 2>/dev/null || true; chmod 777 ./prisma/* 2>/dev/null || true; mkdir -p ./public/uploads && chmod -R 777 ./public/uploads 2>/dev/null || true; npx prisma generate && npx prisma db push --accept-data-loss && (if [ -n \"$ADMIN_PASSWORD\" ]; then node prisma/seed.js || true; fi) && node server.js"]

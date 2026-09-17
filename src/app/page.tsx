@@ -7,6 +7,7 @@ import { SocialLinks } from "@/components/SocialLinks";
 import { AboutPhoto } from "@/components/AboutPhoto";
 import { TerminalHero } from "@/components/TerminalHero";
 import { DiscordPresence } from "@/components/DiscordPresence";
+import { ProjectCard } from "@/components/ProjectCard";
 import Link from "next/link";
 
 export const revalidate = 60; // Revalida cada minuto (SSG + ISR)
@@ -176,28 +177,7 @@ export default async function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.map((project, index) => (
                 <FadeIn key={project.id} delay={index * 0.1}>
-                  <div className="group h-full relative bg-black/40 border border-white/10 rounded-lg overflow-hidden hover:border-cyan-500/50 transition-colors">
-                    <div className="h-48 bg-white/5 relative">
-                      <div className="absolute inset-0 flex items-center justify-center text-white/20 font-mono text-sm">
-                        [IMG_NOT_FOUND]
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                      <p className="text-slate-400 text-sm mb-4">{project.description}</p>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {safeParseTags(project.tags).map((tag: string) => (
-                          <span key={tag} className="text-xs px-2 py-1 bg-cyan-500/10 text-cyan-400 rounded">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex gap-4">
-                        {project.url && <a href={project.url} target="_blank" rel="noreferrer" className="text-sm text-white hover:text-cyan-400">Ver Demo ↗</a>}
-                        {project.repoUrl && <a href={project.repoUrl} target="_blank" rel="noreferrer" className="text-sm text-slate-400 hover:text-white">Código ↗</a>}
-                      </div>
-                    </div>
-                  </div>
+                  <ProjectCard project={project} />
                 </FadeIn>
               ))}
             </div>
@@ -224,28 +204,44 @@ export default async function Home() {
             <div className="space-y-6">
               {posts.map((post, index) => (
                 <FadeIn key={post.id} delay={index * 0.1}>
-                  <article className="p-6 bg-black/50 border border-white/10 rounded-lg hover:border-white/20 transition-colors">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono text-cyan-400 uppercase bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-                          {post.type}
-                        </span>
-                        {post.imageUrl && (
-                          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            MEDIA_ATTACHED
+                  <article className="p-6 bg-black/50 border border-white/10 rounded-xl hover:border-cyan-500/30 transition-all group">
+                    <div className="flex flex-col sm:flex-row gap-5 items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xs font-mono text-cyan-400 uppercase bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                            {post.type}
                           </span>
-                        )}
+                          <span className="text-xs text-slate-500 font-mono">
+                            {new Date(post.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                          <a href={`/blog/${post.slug}`}>{post.title}</a>
+                        </h3>
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-2 leading-relaxed">
+                          {post.content.replace(/[#*`_\[\]]/g, '')}
+                        </p>
+                        <a href={`/blog/${post.slug}`} className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 text-sm font-mono transition-colors">
+                          <span>Leer payload completo</span>
+                          <span>↗</span>
+                        </a>
                       </div>
-                      <span className="text-xs text-slate-500 font-mono">{new Date(post.createdAt).toLocaleDateString()}</span>
+
+                      {post.imageUrl && (
+                        <a
+                          href={`/blog/${post.slug}`}
+                          className="w-full sm:w-36 h-28 relative rounded-lg overflow-hidden border border-white/10 shrink-0 bg-neutral-900 group/thumb"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={post.imageUrl}
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover/thumb:opacity-100 transition-opacity" />
+                        </a>
+                      )}
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-3 hover:text-cyan-400 transition-colors">
-                      <a href={`/blog/${post.slug}`}>{post.title}</a>
-                    </h3>
-                    <p className="text-slate-400 text-sm mb-4 line-clamp-3">{post.content.replace(/[#*`_\[\]]/g, '')}</p>
-                    <a href={`/blog/${post.slug}`} className="text-cyan-400 hover:text-cyan-300 text-sm font-mono flex items-center gap-1">
-                      Leer payload completo ↗
-                    </a>
                   </article>
                 </FadeIn>
               ))}

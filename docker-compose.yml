@@ -16,7 +16,10 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - nanobit-db:/app/prisma
+      - nanobit-uploads:/app/public/uploads
 
 volumes:
   nanobit-db:
     name: nanobit_db_data
+  nanobit-uploads:
+    name: nanobit_uploads_data

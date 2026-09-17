@@ -50,6 +50,7 @@ model Project {
   url         String?
   repoUrl     String?
   imageUrl    String?
+  gifUrl      String?
   tags        String   // Almacenado como JSON en un string
   published   Boolean  @default(false)
   createdAt   DateTime @default(now())
