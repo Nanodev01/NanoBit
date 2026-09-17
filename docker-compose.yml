@@ -14,7 +14,6 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - DATABASE_URL=file:${DATABASE_URL}
     volumes:
-      # Montamos el archivo SQLite para que persista entre reinicios y actualizaciones
       - nanobit-db:/app/prisma
 
 volumes:
