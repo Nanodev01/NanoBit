@@ -4,13 +4,23 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-  const hashedPassword = await bcrypt.hash('nanobit123', 10);
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@nanobit.me';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminPassword) {
+    console.error('ERROR CRÍTICO: Debes definir ADMIN_PASSWORD en tus variables de entorno para crear el administrador de forma segura.');
+    process.exit(1);
+  }
+
+  const hashedPassword = await bcrypt.hash(adminPassword, 10);
   
   const user = await prisma.user.upsert({
-    where: { email: 'admin@nanobit.me' },
-    update: {},
+    where: { email: adminEmail },
+    update: {
+      password: hashedPassword, // Actualiza la contraseña si el usuario ya existe
+    },
     create: {
-      email: 'admin@nanobit.me',
+      email: adminEmail,
       name: 'Nanodev',
       password: hashedPassword,
     },
@@ -23,7 +33,7 @@ async function main() {
     }
   });
 
-  console.log('Seed exitoso. Usuario Admin: admin@nanobit.me | Password: nanobit123');
+  console.log(`Seed exitoso. Usuario Admin configurado: ${adminEmail} | Password: [PROTEGIDO]`);
 }
 
 main()
