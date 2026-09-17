@@ -11,7 +11,7 @@ services:
       - "3001:3000"
     environment:
       - NODE_ENV=production
-      - JWT_SECRET=${JWT_SECRET:-super_secret_jwt_key_nanobit_2026}
+      - JWT_SECRET=${JWT_SECRET}
       - DATABASE_URL=file:/app/prisma/dev.db
     volumes:
       # Montamos el archivo SQLite para que persista entre reinicios y actualizaciones
