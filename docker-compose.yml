@@ -8,7 +8,7 @@ services:
     container_name: nanobit-portfolio
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "3002:3000"
     environment:
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET}
