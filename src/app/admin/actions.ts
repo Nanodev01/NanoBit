@@ -26,29 +26,60 @@ export async function updateProfile(formData: FormData) {
   try {
     const profile = await prisma.profile.findFirst();
     
-    if (profile) {
-      await prisma.profile.update({
-        where: { id: profile.id },
-        data: {
-          title,
-          description,
-          githubUrl,
-          linkedinUrl,
-          discordUrl,
-          email,
-        },
-      });
-    } else {
-      await prisma.profile.create({
-        data: {
-          title,
-          description,
-          githubUrl,
-          linkedinUrl,
-          discordUrl,
-          email,
-        },
-      });
+    try {
+      if (profile) {
+        await prisma.profile.update({
+          where: { id: profile.id },
+          data: {
+            title,
+            description,
+            githubUrl,
+            linkedinUrl,
+            discordUrl,
+            email,
+          },
+        });
+      } else {
+        await prisma.profile.create({
+          data: {
+            title,
+            description,
+            githubUrl,
+            linkedinUrl,
+            discordUrl,
+            email,
+          },
+        });
+      }
+    } catch (clientErr: any) {
+      // Si el cliente en memoria de Prisma aún no reconoce los campos nuevos, aplicamos fallback SQL directo
+      console.warn("Prisma Client validation failed, using direct SQLite fallback:", clientErr?.message);
+
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Profile" ADD COLUMN "githubUrl" TEXT;`);
+      } catch {}
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Profile" ADD COLUMN "linkedinUrl" TEXT;`);
+      } catch {}
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Profile" ADD COLUMN "discordUrl" TEXT;`);
+      } catch {}
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Profile" ADD COLUMN "email" TEXT;`);
+      } catch {}
+
+      if (profile) {
+        await prisma.$executeRawUnsafe(
+          `UPDATE "Profile" SET "title" = ?, "description" = ?, "githubUrl" = ?, "linkedinUrl" = ?, "discordUrl" = ?, "email" = ?, "updatedAt" = CURRENT_TIMESTAMP WHERE "id" = ?`,
+          title, description, githubUrl, linkedinUrl, discordUrl, email, profile.id
+        );
+      } else {
+        const newId = crypto.randomUUID();
+        await prisma.$executeRawUnsafe(
+          `INSERT INTO "Profile" ("id", "title", "description", "githubUrl", "linkedinUrl", "discordUrl", "email", "updatedAt") VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+          newId, title, description, githubUrl, linkedinUrl, discordUrl, email
+        );
+      }
     }
 
     try {

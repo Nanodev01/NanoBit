@@ -12,7 +12,15 @@ import Link from "next/link";
 export const revalidate = 60; // Revalida cada minuto (SSG + ISR)
 
 export default async function Home() {
-  const profile = await prisma.profile.findFirst();
+  let profile: any = await prisma.profile.findFirst();
+  if (profile && !('githubUrl' in profile)) {
+    try {
+      const raw: any = await prisma.$queryRawUnsafe('SELECT * FROM "Profile" LIMIT 1');
+      if (raw && raw.length > 0) {
+        profile = { ...profile, ...raw[0] };
+      }
+    } catch {}
+  }
   const projects = await prisma.project.findMany({ where: { published: true }, orderBy: { createdAt: 'desc' } });
   const posts = await prisma.post.findMany({ where: { published: true }, orderBy: { createdAt: 'desc' }, take: 3 });
 

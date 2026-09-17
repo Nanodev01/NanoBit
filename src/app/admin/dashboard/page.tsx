@@ -21,6 +21,12 @@ export default async function DashboardOverview() {
 
   try {
     profile = await prisma.profile.findFirst();
+    if (profile && !('githubUrl' in profile)) {
+      const raw: any = await prisma.$queryRawUnsafe('SELECT * FROM "Profile" LIMIT 1');
+      if (raw && raw.length > 0) {
+        profile = { ...profile, ...raw[0] };
+      }
+    }
   } catch (err) {
     console.error("Error al cargar perfil en DashboardOverview:", err);
   }
