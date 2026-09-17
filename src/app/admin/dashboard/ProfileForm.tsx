@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { updateProfile } from "../actions";
-import { Save, CheckCircle2, User, Globe, Mail, MessageSquare, Code2, Share2 } from "lucide-react";
+import { Save, CheckCircle2, AlertTriangle, User, Globe, Mail, MessageSquare, Code2, Share2 } from "lucide-react";
 
 interface ProfileData {
   title?: string | null;
@@ -16,14 +16,26 @@ interface ProfileData {
 export function ProfileForm({ initialProfile }: { initialProfile?: ProfileData | null }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setSuccess(false);
-    await updateProfile(formData);
-    setLoading(false);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3500);
+    setErrorMsg(null);
+
+    try {
+      const res = await updateProfile(formData);
+      if (res && "error" in res && res.error) {
+        setErrorMsg(res.error);
+      } else {
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 4000);
+      }
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Error inesperado al conectar con el servidor.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -32,6 +44,13 @@ export function ProfileForm({ initialProfile }: { initialProfile?: ProfileData |
         <div className="flex items-center gap-2 p-3 text-emerald-400 text-sm font-mono bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
           <CheckCircle2 className="w-4 h-4" />
           <span>[OK] Perfil y enlaces de redes sociales actualizados en tiempo real.</span>
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="flex items-center gap-2 p-3 text-red-400 text-sm font-mono bg-red-500/10 border border-red-500/20 rounded-lg">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>[ERROR] {errorMsg}</span>
         </div>
       )}
 
