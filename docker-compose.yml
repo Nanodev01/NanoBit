@@ -12,7 +12,7 @@ services:
     environment:
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET}
-      - DATABASE_URL=file:${DATABASE_URL}
+      - DATABASE_URL=${DATABASE_URL:-file:./dev.db}
     volumes:
       - nanobit-db:/app/prisma
 

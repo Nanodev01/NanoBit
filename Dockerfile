@@ -17,8 +17,8 @@ COPY . .
 
 # Generate prisma client and build the app
 # Create a dummy database for Next.js Static Site Generation during build
-ENV DATABASE_URL="file:/app/prisma/dev.db"
-RUN npx prisma db push
+ENV DATABASE_URL="file:./dev.db"
+RUN npx prisma db push --accept-data-loss
 RUN npx prisma generate
 RUN npm run build
 
