@@ -5,6 +5,9 @@ import { FadeIn } from "@/components/FadeIn";
 import { ContactForm } from "@/components/ContactForm";
 import { SocialLinks } from "@/components/SocialLinks";
 import { AboutPhoto } from "@/components/AboutPhoto";
+import { TerminalHero } from "@/components/TerminalHero";
+import { DiscordPresence } from "@/components/DiscordPresence";
+import Link from "next/link";
 
 export const revalidate = 60; // Revalida cada minuto (SSG + ISR)
 
@@ -12,6 +15,13 @@ export default async function Home() {
   const profile = await prisma.profile.findFirst();
   const projects = await prisma.project.findMany({ where: { published: true }, orderBy: { createdAt: 'desc' } });
   const posts = await prisma.post.findMany({ where: { published: true }, orderBy: { createdAt: 'desc' }, take: 3 });
+
+  const socialLinks = {
+    github: profile?.githubUrl,
+    linkedin: profile?.linkedinUrl,
+    discord: profile?.discordUrl,
+    email: profile?.email,
+  };
 
   return (
     <div className="min-h-screen bg-black text-slate-300 font-sans selection:bg-cyan-500/30 overflow-hidden">
@@ -23,10 +33,11 @@ export default async function Home() {
               <a href="#about" className="hover:text-cyan-400 transition-colors">/sobre-mi</a>
               <a href="#projects" className="hover:text-cyan-400 transition-colors">/proyectos</a>
               <a href="#blog" className="hover:text-cyan-400 transition-colors">/blog</a>
+              <Link href="/lente" className="hover:text-cyan-400 transition-colors text-slate-400">/lente</Link>
               <a href="#contact" className="hover:text-cyan-400 transition-colors">/contacto</a>
             </nav>
             <div className="border-l border-white/10 pl-4 hidden sm:block">
-              <SocialLinks variant="navbar" />
+              <SocialLinks variant="navbar" links={socialLinks} />
             </div>
           </div>
         </div>
@@ -36,14 +47,11 @@ export default async function Home() {
       <main className="container mx-auto px-4 py-20 flex flex-col lg:flex-row items-center gap-12 min-h-[calc(100vh-4rem)]">
         <div className="flex-1 space-y-6 z-10">
           <FadeIn delay={0.1}>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              System Online
-            </div>
+            <DiscordPresence />
           </FadeIn>
           <FadeIn delay={0.2}>
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
-              Software Engineer <br/>
+              Software Programmer <br/>
               <span className="text-cyan-400">&</span> Cybersecurity
             </h1>
           </FadeIn>
@@ -65,41 +73,18 @@ export default async function Home() {
           <FadeIn delay={0.45}>
             <div className="pt-2 space-y-2">
               <span className="text-xs font-mono text-slate-500 block tracking-wider">// ENLACES_DE_RED</span>
-              <SocialLinks variant="hero" />
+              <SocialLinks variant="hero" links={socialLinks} />
             </div>
           </FadeIn>
         </div>
 
-        {/* Componente de Terminal Hero Decorativo */}
-        <div className="flex-1 w-full max-w-lg hidden lg:block">
+        {/* Componente de Terminal Hero Interactiva */}
+        <div className="flex-1 w-full max-w-lg lg:max-w-xl">
           <FadeIn delay={0.5}>
-            <div className="rounded-lg border border-white/10 bg-black overflow-hidden shadow-2xl shadow-cyan-900/20 relative">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/5">
-                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                <div className="mx-auto text-xs text-slate-500 font-mono">root@nanobit:~</div>
-              </div>
-              <div className="p-4 font-mono text-sm space-y-2 h-[300px] text-slate-300">
-                <div className="flex gap-2">
-                  <span className="text-cyan-400">➜</span>
-                  <span className="text-emerald-400">~</span>
-                  <span>./init_system.sh</span>
-                </div>
-                <div className="text-slate-500">[OK] Cargando módulos de seguridad...</div>
-                <div className="text-slate-500">[OK] Inicializando entorno de desarrollo...</div>
-                <div className="flex gap-2 mt-4">
-                  <span className="text-cyan-400">➜</span>
-                  <span className="text-emerald-400">~</span>
-                  <span className="text-yellow-300">whoami</span>
-                </div>
-                <div className="text-white mt-1">nanodev</div>
-                <div className="flex gap-2 mt-4">
-                  <span className="text-cyan-400 animate-pulse">▋</span>
-                </div>
-              </div>
-              <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/10 via-transparent to-transparent opacity-50"></div>
-            </div>
+            <TerminalHero
+              projects={projects}
+              profileDescription={profile?.description}
+            />
           </FadeIn>
         </div>
       </main>
@@ -134,7 +119,7 @@ export default async function Home() {
                   <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10 font-mono text-xs text-slate-400">
                     <div className="space-y-1">
                       <span className="text-cyan-400 block font-semibold">// ROL_PRINCIPAL</span>
-                      <span className="text-white">Software Engineer</span>
+                      <span className="text-white">{profile?.title || "Software Programmer"}</span>
                     </div>
                     <div className="space-y-1">
                       <span className="text-cyan-400 block font-semibold">// ESPECIALIDAD</span>
@@ -151,6 +136,17 @@ export default async function Home() {
                         Open to Opportunities
                       </span>
                     </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-mono text-slate-500">// OFFLINE_HOBBY</span>
+                    <Link
+                      href="/lente"
+                      className="inline-flex items-center gap-1.5 text-xs font-mono text-cyan-400 hover:text-cyan-300 hover:underline transition-colors"
+                    >
+                      <span>Cuando no estoy programando (Fotografía)</span>
+                      <span>/lente ↗</span>
+                    </Link>
                   </div>
                 </div>
               </FadeIn>
@@ -222,8 +218,18 @@ export default async function Home() {
                 <FadeIn key={post.id} delay={index * 0.1}>
                   <article className="p-6 bg-black/50 border border-white/10 rounded-lg hover:border-white/20 transition-colors">
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-xs font-mono text-cyan-400 uppercase">{post.type}</span>
-                      <span className="text-xs text-slate-500">{new Date(post.createdAt).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-cyan-400 uppercase bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                          {post.type}
+                        </span>
+                        {post.imageUrl && (
+                          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            MEDIA_ATTACHED
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-500 font-mono">{new Date(post.createdAt).toLocaleDateString()}</span>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-3 hover:text-cyan-400 transition-colors">
                       <a href={`/blog/${post.slug}`}>{post.title}</a>
@@ -266,7 +272,7 @@ export default async function Home() {
       {/* FOOTER */}
       <footer className="border-t border-white/5 py-12 text-center text-slate-500 text-sm font-mono space-y-6">
         <div className="container mx-auto px-4 max-w-4xl space-y-6">
-          <SocialLinks variant="footer" />
+          <SocialLinks variant="footer" links={socialLinks} />
           <div className="text-xs text-slate-600 space-y-1">
             <p>Construido con <span className="text-cyan-400">React & Next.js</span>. Protegido por arquitectura defensiva.</p>
             <p>© {new Date().getFullYear()} nanobit.me — Todos los derechos reservados.</p>

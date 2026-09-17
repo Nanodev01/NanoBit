@@ -11,7 +11,7 @@ interface AboutPhotoProps {
 
 export function AboutPhoto({
   imageSrc = "/me.png",
-  alt = "Nanodev - Software Engineer & Cybersecurity",
+  alt = "Nanodev - Software Programmer & Cybersecurity",
 }: AboutPhotoProps) {
   const [imgError, setImgError] = useState(false);
 
@@ -51,8 +51,8 @@ export function AboutPhoto({
               <p className="text-white font-mono text-sm font-semibold tracking-wider uppercase">
                 Nanodev
               </p>
-              <p className="text-xs font-mono text-slate-500">
-                Coloca tu foto en <code className="text-cyan-400">public/me.png</code>
+              <p className="text-xs font-mono text-cyan-400/80 tracking-widest">
+                // SYSTEM_OPERATOR
               </p>
             </div>
           </div>

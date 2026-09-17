@@ -32,14 +32,14 @@ async function main() {
     await prisma.profile.update({
       where: { id: existingProfile.id },
       data: {
-        title: 'Software Engineer & Cybersecurity',
+        title: 'Software Programmer & Cybersecurity',
         description: 'Construyendo soluciones escalables, eficientes y seguras. Me enfoco en la calidad del código y la resiliencia de la infraestructura.',
       }
     });
   } else {
     await prisma.profile.create({
       data: {
-        title: 'Software Engineer & Cybersecurity',
+        title: 'Software Programmer & Cybersecurity',
         description: 'Construyendo soluciones escalables, eficientes y seguras. Me enfoco en la calidad del código y la resiliencia de la infraestructura.',
       }
     });

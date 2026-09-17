@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "nanobit.me",
   author: "Nanodev",
-  title: "Software Engineer & Cybersecurity",
+  title: "Software Programmer & Cybersecurity",
   description: "Portfolio de desarrollo de software y ciberseguridad. Construyendo arquitectura resiliente y sistemas seguros.",
   url: "https://nanobit.me",
   links: {
@@ -14,6 +14,7 @@ export const siteConfig = {
     github: "@Nanodev01",
     linkedin: "nanodev",
     discord: "nanodev#0001",
+    discordId: "", // Tu Discord ID numérico para Lanyard (ej: '123456789012345678')
     email: "contacto@nanobit.me",
   }
 };

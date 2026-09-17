@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyAuth } from "@/lib/auth";
 import { Logo } from "@/components/Logo";
 import { LogoutButton } from "@/components/LogoutButton";
-import { LayoutDashboard, Mail, FolderGit2, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, Mail, FolderGit2, FileText, Camera, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -45,6 +45,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Link href="/admin/dashboard/blog" className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors">
             <FileText className="w-5 h-5" />
             Blog
+          </Link>
+          <Link href="/admin/dashboard/lente" className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors">
+            <Camera className="w-5 h-5" />
+            Galería /lente
           </Link>
           <Link href="/admin/dashboard#profile" className="flex items-center gap-3 px-4 py-3 rounded-md hover:bg-white/5 text-slate-400 hover:text-white transition-colors">
             <Settings className="w-5 h-5" />

@@ -23,6 +23,23 @@ model Profile {
   id          String   @id @default(uuid())
   title       String
   description String
+  githubUrl   String?
+  linkedinUrl String?
+  discordUrl  String?
+  email       String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Photo {
+  id          String   @id @default(uuid())
+  title       String
+  location    String?
+  category    String   // Tag libre que el usuario defina: "Paisaje", "Urbano", etc.
+  imageUrl    String
+  cameraInfo  String?
+  date        String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
@@ -45,6 +62,7 @@ model Post {
   slug        String   @unique
   content     String
   type        String   // EJ: "blog", "certificate", "linkedin"
+  imageUrl    String?
   published   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

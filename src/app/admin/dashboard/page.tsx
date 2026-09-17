@@ -50,10 +50,10 @@ export default async function DashboardOverview() {
         <MessageList initialMessages={messages} />
       </section>
 
-      {/* PROFILE EDITOR SHORTCUT */}
+      {/* PROFILE EDITOR & SOCIAL SETTINGS */}
       <section id="profile" className="mb-12">
-          <h2 className="text-xl font-bold text-white mb-4 border-b border-white/10 pb-2">Perfil: Sobre mí</h2>
-          <ProfileForm initialDescription={profile?.description || ""} />
+          <h2 className="text-xl font-bold text-white mb-4 border-b border-white/10 pb-2">Perfil & Configuración de Redes</h2>
+          <ProfileForm initialProfile={profile} />
       </section>
     </main>
   );

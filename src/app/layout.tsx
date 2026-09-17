@@ -13,7 +13,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "nanobit.me | Software Engineer & Cybersecurity",
+  title: "nanobit.me | Software Programmer & Cybersecurity",
   description: "Portfolio de desarrollo de software y ciberseguridad.",
 };
 
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="dark scroll-smooth">
+    <html lang="es" className="dark scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${geistSans.variable} ${jetbrainsMono.variable} antialiased bg-black text-slate-300 font-sans`}>
         {children}
       </body>

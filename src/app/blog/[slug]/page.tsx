@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { ImageLightbox } from "@/components/ImageLightbox";
 
 export const revalidate = 60;
 
@@ -49,6 +50,18 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
               {post.title}
             </h1>
           </header>
+
+          {post.imageUrl && (
+            <div className="mb-8">
+              <ImageLightbox
+                src={post.imageUrl}
+                alt={post.title}
+                title={post.title}
+                badge={post.type}
+                date={new Date(post.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+              />
+            </div>
+          )}
 
           <div className="prose prose-invert prose-cyan max-w-none prose-pre:bg-black/80 prose-pre:border prose-pre:border-white/10 prose-headings:text-white prose-a:text-cyan-400">
             <ReactMarkdown>

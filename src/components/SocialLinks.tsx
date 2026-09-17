@@ -32,32 +32,45 @@ function DiscordIcon({ className = "w-5 h-5" }: { className?: string }) {
 interface SocialLinksProps {
   variant?: "hero" | "navbar" | "footer";
   className?: string;
+  links?: {
+    github?: string | null;
+    linkedin?: string | null;
+    discord?: string | null;
+    email?: string | null;
+  };
 }
 
-export function SocialLinks({ variant = "hero", className = "" }: SocialLinksProps) {
+export function SocialLinks({ variant = "hero", className = "", links }: SocialLinksProps) {
+  const githubHref = links?.github || siteConfig.links.github;
+  const linkedinHref = links?.linkedin || siteConfig.links.linkedin;
+  const discordHref = links?.discord || siteConfig.links.discord;
+  const emailHref = links?.email
+    ? (links.email.startsWith("mailto:") ? links.email : `mailto:${links.email}`)
+    : siteConfig.links.email;
+
   const items = [
     {
       name: "GitHub",
-      href: siteConfig.links.github,
+      href: githubHref,
       handle: siteConfig.handles.github,
       icon: GithubIcon,
     },
     {
       name: "LinkedIn",
-      href: siteConfig.links.linkedin,
+      href: linkedinHref,
       handle: siteConfig.handles.linkedin,
       icon: LinkedinIcon,
     },
     {
       name: "Discord",
-      href: siteConfig.links.discord,
+      href: discordHref,
       handle: siteConfig.handles.discord,
       icon: DiscordIcon,
     },
     {
       name: "Email",
-      href: siteConfig.links.email,
-      handle: siteConfig.handles.email,
+      href: emailHref,
+      handle: links?.email || siteConfig.handles.email,
       icon: Mail,
     },
   ];

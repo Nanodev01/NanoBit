@@ -54,6 +54,19 @@ export default function NewPostPage() {
         </div>
 
         <div className="space-y-2">
+          <label className="text-sm font-mono text-slate-400">URL de Imagen / Certificado (Opcional)</label>
+          <input 
+            type="url" 
+            name="imageUrl"
+            placeholder="https://... o /certificados/diploma.png (activa el visor lightbox)"
+            className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-cyan-500"
+          />
+          <p className="text-xs text-slate-500 font-mono">
+            Si el tipo es CERTIFICADO, esta imagen se mostrará con visor interactivo a pantalla completa.
+          </p>
+        </div>
+
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-sm font-mono text-slate-400">Cuerpo del Mensaje (Markdown)</label>
             <div className="flex items-center gap-1 text-xs text-slate-500 bg-white/5 px-2 py-1 rounded border border-white/10">
