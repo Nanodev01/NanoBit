@@ -278,6 +278,56 @@ export async function createPost(formData: FormData) {
   }
 }
 
+export async function updatePost(formData: FormData) {
+  try {
+    await verifyAuth();
+
+    const id = (formData.get("id") as string)?.trim();
+    const title = (formData.get("title") as string)?.trim();
+    const content = (formData.get("content") as string)?.trim();
+    const type = (formData.get("type") as string) || "blog";
+    let finalImageUrl = (formData.get("imageUrl") as string)?.trim() || null;
+    const file = formData.get("file") as File | null;
+    const uploadedImageUrl = await saveUploadedFile(file, "posts");
+    if (uploadedImageUrl) finalImageUrl = uploadedImageUrl;
+
+    const published = formData.get("published") === "on";
+
+    if (!id || !title || !content) {
+      return { error: "ID, título y contenido son obligatorios" };
+    }
+
+    try {
+      await prisma.post.update({
+        where: { id },
+        data: {
+          title,
+          content,
+          type,
+          imageUrl: finalImageUrl,
+          published,
+        },
+      });
+    } catch (clientErr: any) {
+      console.warn("Prisma Client validation failed for updatePost, using direct SQLite fallback:", clientErr?.message);
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Post" ADD COLUMN "imageUrl" TEXT;`);
+      } catch {}
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Post" SET "title" = ?, "content" = ?, "type" = ?, "imageUrl" = ?, "published" = ?, "updatedAt" = CURRENT_TIMESTAMP WHERE "id" = ?`,
+        title, content, type, finalImageUrl, published ? 1 : 0, id
+      );
+    }
+
+    revalidatePath("/admin/dashboard/blog");
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error al actualizar publicación:", err);
+    return { error: err?.message || "Error al actualizar la publicación" };
+  }
+}
+
 export async function deletePost(id: string) {
   try {
     await verifyAuth();

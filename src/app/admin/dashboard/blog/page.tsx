@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { FileText, Plus } from "lucide-react";
+import { FileText, Plus, Pencil } from "lucide-react";
 import { DeletePostButton } from "./DeletePostButton";
 
 export default async function BlogPage() {
@@ -45,7 +45,14 @@ export default async function BlogPage() {
                 <h3 className="text-xl font-bold text-white">{post.title}</h3>
                 <p className="text-slate-400 text-sm mt-2 line-clamp-1">{post.content}</p>
               </div>
-              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                <Link
+                  href={`/admin/dashboard/blog/${post.id}/edit`}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 border border-white/10 transition-colors"
+                  title="Editar publicación"
+                >
+                  <Pencil className="w-4 h-4" />
+                </Link>
                 <DeletePostButton id={post.id} />
               </div>
             </div>
