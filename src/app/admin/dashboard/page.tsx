@@ -3,9 +3,27 @@ import { MessageList } from "./MessageList";
 import { ProfileForm } from "./ProfileForm";
 
 export default async function DashboardOverview() {
-  const messages = await prisma.message.findMany({ orderBy: { createdAt: "desc" }, take: 10 });
-  const projects = await prisma.project.findMany({ orderBy: { createdAt: "desc" } });
-  const profile = await prisma.profile.findFirst();
+  let messages: any[] = [];
+  let projects: any[] = [];
+  let profile: any = null;
+
+  try {
+    messages = await prisma.message.findMany({ orderBy: { createdAt: "desc" }, take: 10 });
+  } catch (err) {
+    console.error("Error al cargar mensajes en DashboardOverview:", err);
+  }
+
+  try {
+    projects = await prisma.project.findMany({ orderBy: { createdAt: "desc" } });
+  } catch (err) {
+    console.error("Error al cargar proyectos en DashboardOverview:", err);
+  }
+
+  try {
+    profile = await prisma.profile.findFirst();
+  } catch (err) {
+    console.error("Error al cargar perfil en DashboardOverview:", err);
+  }
 
   const uptimeSeconds = process.uptime();
   const d = Math.floor(uptimeSeconds / 86400);

@@ -13,7 +13,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/admin/login");
   }
 
-  const unreadMessages = await prisma.message.count({ where: { read: false } });
+  let unreadMessages = 0;
+  try {
+    unreadMessages = await prisma.message.count({ where: { read: false } });
+  } catch (err) {
+    console.error("Error al consultar unreadMessages:", err);
+  }
 
   return (
     <div className="min-h-screen bg-black text-slate-300 font-sans flex flex-col md:flex-row">
