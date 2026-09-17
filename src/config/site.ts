@@ -14,7 +14,7 @@ export const siteConfig = {
     github: "@Nanodev01",
     linkedin: "nanodev",
     discord: "nanodev#0001",
-    discordId: "418953438328782850",
+    discordId: "", // Se configura vía variable de entorno NEXT_PUBLIC_DISCORD_USER_ID
     email: "contacto@nanobit.me",
   }
 };
