@@ -211,6 +211,71 @@ export async function createProject(formData: FormData) {
   }
 }
 
+export async function updateProject(formData: FormData) {
+  try {
+    await verifyAuth();
+
+    const id = (formData.get("id") as string)?.trim();
+    const title = (formData.get("title") as string)?.trim();
+    const description = (formData.get("description") as string)?.trim();
+    const url = (formData.get("url") as string)?.trim() || null;
+    const repoUrl = (formData.get("repoUrl") as string)?.trim() || null;
+    const tags = (formData.get("tags") as string) || "";
+    const published = formData.get("published") === "on";
+
+    if (!id || !title || !description) {
+      return { error: "ID, título y descripción son obligatorios" };
+    }
+
+    let finalImageUrl = (formData.get("imageUrl") as string)?.trim() || null;
+    const imageFile = formData.get("imageFile") as File | null;
+    const uploadedImageUrl = await saveUploadedFile(imageFile, "projects");
+    if (uploadedImageUrl) finalImageUrl = uploadedImageUrl;
+
+    let finalGifUrl = (formData.get("gifUrl") as string)?.trim() || null;
+    const gifFile = formData.get("gifFile") as File | null;
+    const uploadedGifUrl = await saveUploadedFile(gifFile, "projects");
+    if (uploadedGifUrl) finalGifUrl = uploadedGifUrl;
+
+    const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+
+    try {
+      await (prisma.project as any).update({
+        where: { id },
+        data: {
+          title,
+          description,
+          url,
+          repoUrl,
+          imageUrl: finalImageUrl,
+          gifUrl: finalGifUrl,
+          published,
+          tags: JSON.stringify(tagsArray)
+        }
+      });
+    } catch (clientErr: any) {
+      console.warn("Prisma Client validation failed for updateProject, using direct SQLite fallback:", clientErr?.message);
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Project" ADD COLUMN "imageUrl" TEXT;`);
+      } catch {}
+      try {
+        await prisma.$executeRawUnsafe(`ALTER TABLE "Project" ADD COLUMN "gifUrl" TEXT;`);
+      } catch {}
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Project" SET "title" = ?, "description" = ?, "url" = ?, "repoUrl" = ?, "imageUrl" = ?, "gifUrl" = ?, "tags" = ?, "published" = ?, "updatedAt" = CURRENT_TIMESTAMP WHERE "id" = ?`,
+        title, description, url, repoUrl, finalImageUrl, finalGifUrl, JSON.stringify(tagsArray), published ? 1 : 0, id
+      );
+    }
+
+    revalidatePath("/admin/dashboard/projects");
+    revalidatePath("/");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Error al actualizar proyecto:", err);
+    return { error: err?.message || "Error al actualizar el proyecto" };
+  }
+}
+
 export async function deleteProject(id: string) {
   try {
     await verifyAuth();

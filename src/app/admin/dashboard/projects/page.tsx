@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { FolderGit2, Plus, ExternalLink, GitBranch } from "lucide-react";
+import { FolderGit2, Plus, ExternalLink, GitBranch, Pencil } from "lucide-react";
 import { safeParseTags } from "@/lib/utils";
 import { deleteProject } from "../../actions";
 import { DeleteProjectButton } from "./DeleteProjectButton";
@@ -34,7 +34,14 @@ export default async function ProjectsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map(project => (
             <div key={project.id} className="bg-white/5 border border-white/10 p-6 rounded-lg relative group">
-              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-4 right-4 flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                <Link
+                  href={`/admin/dashboard/projects/${project.id}/edit`}
+                  className="p-2 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-slate-400 hover:text-cyan-300 border border-white/10 transition-colors"
+                  title="Editar proyecto"
+                >
+                  <Pencil className="w-4 h-4" />
+                </Link>
                 <DeleteProjectButton id={project.id} />
               </div>
               
