@@ -49,6 +49,86 @@ export function TerminalHero({ projects = [], profileDescription }: TerminalHero
 
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const matrixCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Cargar tema guardado desde localStorage y enfocar input
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("nanobit_theme") as ThemeColor;
+      if (saved && ["cyan", "emerald", "violet", "amber"].includes(saved)) {
+        setTheme(saved);
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch {}
+    inputRef.current?.focus();
+  }, []);
+
+  // Efecto de lluvia digital Matrix Canvas
+  useEffect(() => {
+    if (!isMatrixMode) return;
+
+    const canvas = matrixCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const updateSize = () => {
+      if (canvas && canvas.parentElement) {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+      }
+    };
+    updateSize();
+
+    const characters = "0123456789ABCDEF01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+    const fontSize = 14;
+    let columns = Math.floor((canvas.width || 600) / fontSize);
+    let drops: number[] = Array(columns).fill(1);
+
+    const handleResize = () => {
+      updateSize();
+      columns = Math.floor((canvas.width || 600) / fontSize);
+      drops = Array(columns).fill(1);
+    };
+    window.addEventListener("resize", handleResize);
+
+    const render = () => {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#10b981";
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    };
+
+    const intervalId = setInterval(render, 35);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMatrixMode]);
+
+  // Salir de Matrix con tecla ESC
+  useEffect(() => {
+    if (!isMatrixMode) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsMatrixMode(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMatrixMode]);
 
   // Auto-scroll al final en cada comando
   useEffect(() => {
@@ -390,10 +470,13 @@ export function TerminalHero({ projects = [], profileDescription }: TerminalHero
         break;
 
       case "matrix":
-        setIsMatrixMode((prev) => !prev);
+        const nextMatrix = !isMatrixMode;
+        setIsMatrixMode(nextMatrix);
         outputContent = (
           <p className="text-xs text-emerald-400 font-mono">
-            Modo Matrix {!isMatrixMode ? "ACTIVADO" : "DESACTIVADO"}.
+            {nextMatrix
+              ? "⚡ Modo Matrix Digital Rain ACTIVADO. (Presiona ESC o escribe 'matrix' para desactivar)"
+              : "Modo Matrix DESACTIVADO."}
           </p>
         );
         break;
@@ -402,16 +485,23 @@ export function TerminalHero({ projects = [], profileDescription }: TerminalHero
         const requestedTheme = args[0]?.toLowerCase() as ThemeColor;
         if (["cyan", "emerald", "violet", "amber"].includes(requestedTheme)) {
           setTheme(requestedTheme);
+          try {
+            localStorage.setItem("nanobit_theme", requestedTheme);
+            document.documentElement.setAttribute("data-theme", requestedTheme);
+          } catch {}
           outputContent = (
             <p className="text-xs text-slate-300">
-              Tema cambiado a: <span className="font-bold uppercase">{requestedTheme}</span>
+              Tema global actualizado a: <span className="font-bold uppercase text-cyan-400">{requestedTheme}</span>
             </p>
           );
         } else {
           outputContent = (
-            <p className="text-xs text-yellow-400">
-              Uso: theme &lt;cyan | emerald | violet | amber&gt;
-            </p>
+            <div className="text-xs space-y-1">
+              <p className="text-yellow-400">Uso: theme &lt;cyan | emerald | violet | amber&gt;</p>
+              <p className="text-slate-500">
+                Ejemplo: <code className="text-cyan-300">theme emerald</code> o <code className="text-cyan-300">theme violet</code>
+              </p>
+            </div>
           );
         }
         break;
@@ -462,7 +552,7 @@ export function TerminalHero({ projects = [], profileDescription }: TerminalHero
       {/* TERMINAL OUTPUT STREAM */}
       <div
         ref={scrollRef}
-        className={`flex-1 p-4 overflow-y-auto space-y-3 text-sm scrollbar-thin scrollbar-thumb-white/10 ${
+        className={`flex-1 p-4 overflow-y-auto space-y-3 text-sm scrollbar-thin scrollbar-thumb-white/10 relative z-10 ${
           isMatrixMode ? "text-emerald-400 font-bold" : "text-slate-300"
         }`}
       >
@@ -491,7 +581,6 @@ export function TerminalHero({ projects = [], profileDescription }: TerminalHero
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isSubmitting}
-              autoFocus
               spellCheck={false}
               autoComplete="off"
               className="w-full bg-transparent border-none text-white focus:outline-none focus:ring-0 p-0 font-mono text-xs caret-cyan-400"
@@ -500,6 +589,26 @@ export function TerminalHero({ projects = [], profileDescription }: TerminalHero
           </div>
         </form>
       </div>
+
+      {/* MATRIX DIGITAL RAIN OVERLAY */}
+      {isMatrixMode && (
+        <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-xl bg-black/60 backdrop-blur-[1px]">
+          <canvas ref={matrixCanvasRef} className="w-full h-full block opacity-90" />
+          <div className="absolute top-2.5 right-3 pointer-events-auto flex items-center gap-2">
+            <span className="text-[10px] text-emerald-500/80 font-mono hidden sm:inline">MATRIX_STREAM://ON</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMatrixMode(false);
+              }}
+              className="text-[10px] bg-black/90 hover:bg-emerald-950 text-emerald-400 border border-emerald-500/50 px-2 py-0.5 rounded font-mono transition-colors shadow"
+            >
+              [ESC / Salir]
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Cyber Scanline Subtle Overlay */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/[0.04] via-transparent to-transparent opacity-60"></div>

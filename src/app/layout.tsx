@@ -23,8 +23,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="dark scroll-smooth" data-scroll-behavior="smooth">
-      <body className={`${geistSans.variable} ${jetbrainsMono.variable} antialiased bg-black text-slate-300 font-sans`}>
+    <html
+      lang="es"
+      className="dark scroll-smooth"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('nanobit_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body
+        className={`${geistSans.variable} ${jetbrainsMono.variable} antialiased bg-black text-slate-300 font-sans`}
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

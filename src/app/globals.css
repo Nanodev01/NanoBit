@@ -128,3 +128,31 @@
     @apply font-sans;
   }
 }
+
+/* THEMES: Dynamic accent overrides across the entire web */
+html[data-theme="emerald"] {
+  --color-cyan-300: #6ee7b7;
+  --color-cyan-400: #34d399;
+  --color-cyan-500: #10b981;
+  --color-cyan-600: #059669;
+  --color-cyan-900: #064e3b;
+  --color-cyan-950: #022c22;
+}
+
+html[data-theme="violet"] {
+  --color-cyan-300: #c4b5fd;
+  --color-cyan-400: #a78bfa;
+  --color-cyan-500: #8b5cf6;
+  --color-cyan-600: #7c3aed;
+  --color-cyan-900: #4c1d95;
+  --color-cyan-950: #2e1065;
+}
+
+html[data-theme="amber"] {
+  --color-cyan-300: #fcd34d;
+  --color-cyan-400: #fbbf24;
+  --color-cyan-500: #f59e0b;
+  --color-cyan-600: #d97706;
+  --color-cyan-900: #78350f;
+  --color-cyan-950: #451a03;
+}

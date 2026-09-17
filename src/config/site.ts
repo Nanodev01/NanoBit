@@ -14,7 +14,7 @@ export const siteConfig = {
     github: "@Nanodev01",
     linkedin: "nanodev",
     discord: "nanodev#0001",
-    discordId: "", // Tu Discord ID numérico para Lanyard (ej: '123456789012345678')
+    discordId: "418953438328782850",
     email: "contacto@nanobit.me",
   }
 };
