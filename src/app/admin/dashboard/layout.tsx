@@ -1,16 +1,15 @@
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { verifyAuth } from "@/lib/auth";
 import { Logo } from "@/components/Logo";
 import { LogoutButton } from "@/components/LogoutButton";
 import { LayoutDashboard, Mail, FolderGit2, FileText, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
-
-  if (!token) {
+  try {
+    await verifyAuth();
+  } catch {
     redirect("/admin/login");
   }
 

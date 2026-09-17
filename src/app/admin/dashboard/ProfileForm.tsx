@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { updateProfile } from "../actions";
 
 export function ProfileForm({ initialDescription }: { initialDescription: string }) {

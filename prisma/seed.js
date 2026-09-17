@@ -26,12 +26,24 @@ async function main() {
     },
   });
 
-  const profile = await prisma.profile.create({
-    data: {
-      title: 'Software Engineer & Cybersecurity',
-      description: 'Construyendo soluciones escalables, eficientes y seguras. Me enfoco en la calidad del código y la resiliencia de la infraestructura.',
-    }
-  });
+  const existingProfile = await prisma.profile.findFirst();
+
+  if (existingProfile) {
+    await prisma.profile.update({
+      where: { id: existingProfile.id },
+      data: {
+        title: 'Software Engineer & Cybersecurity',
+        description: 'Construyendo soluciones escalables, eficientes y seguras. Me enfoco en la calidad del código y la resiliencia de la infraestructura.',
+      }
+    });
+  } else {
+    await prisma.profile.create({
+      data: {
+        title: 'Software Engineer & Cybersecurity',
+        description: 'Construyendo soluciones escalables, eficientes y seguras. Me enfoco en la calidad del código y la resiliencia de la infraestructura.',
+      }
+    });
+  }
 
   console.log(`Seed exitoso. Usuario Admin configurado: ${adminEmail} | Password: [PROTEGIDO]`);
 }

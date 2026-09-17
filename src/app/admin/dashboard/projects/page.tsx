@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { FolderGit2, Plus, ExternalLink, GitBranch, Trash2 } from "lucide-react";
+import { FolderGit2, Plus, ExternalLink, GitBranch } from "lucide-react";
+import { safeParseTags } from "@/lib/utils";
 import { deleteProject } from "../../actions";
 import { DeleteProjectButton } from "./DeleteProjectButton";
 
@@ -46,7 +47,7 @@ export default async function ProjectsPage() {
               <p className="text-slate-400 text-sm mb-4 line-clamp-2">{project.description}</p>
               
               <div className="flex flex-wrap gap-2 mb-4">
-                {JSON.parse(project.tags).map((tag: string) => (
+                {safeParseTags(project.tags).map((tag: string) => (
                   <span key={tag} className="text-xs px-2 py-1 bg-white/10 text-slate-300 rounded">
                     {tag}
                   </span>

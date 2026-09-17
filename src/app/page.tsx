@@ -1,5 +1,6 @@
 import { Logo } from "@/components/Logo";
 import { prisma } from "@/lib/prisma";
+import { safeParseTags } from "@/lib/utils";
 import { FadeIn } from "@/components/FadeIn";
 import { ContactForm } from "@/components/ContactForm";
 
@@ -129,7 +130,7 @@ export default async function Home() {
                       <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
                       <p className="text-slate-400 text-sm mb-4">{project.description}</p>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {JSON.parse(project.tags).map((tag: string) => (
+                        {safeParseTags(project.tags).map((tag: string) => (
                           <span key={tag} className="text-xs px-2 py-1 bg-cyan-500/10 text-cyan-400 rounded">
                             {tag}
                           </span>

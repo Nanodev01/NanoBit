@@ -1,10 +1,13 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { verifyAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 // --- PERFIL ---
 export async function updateProfile(formData: FormData) {
+  await verifyAuth();
+
   const description = formData.get("description") as string;
   
   if (!description) return { error: "La descripción no puede estar vacía" };
@@ -29,6 +32,8 @@ export async function updateProfile(formData: FormData) {
 
 // --- MENSAJES ---
 export async function markMessageAsRead(id: string) {
+  await verifyAuth();
+
   await prisma.message.update({
     where: { id },
     data: { read: true },
@@ -37,28 +42,25 @@ export async function markMessageAsRead(id: string) {
 }
 
 export async function deleteMessage(id: string) {
+  await verifyAuth();
+
   await prisma.message.delete({
     where: { id },
   });
   revalidatePath("/admin/dashboard");
 }
 
-// --- PROYECTOS (Base) ---
-// (Se implementarán en el siguiente paso)
-
-// --- BLOG (Base) ---
-// (Se implementarán en el siguiente paso)
-
 // --- PROYECTOS ---
 export async function createProject(formData: FormData) {
+  await verifyAuth();
+
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const url = formData.get("url") as string;
   const repoUrl = formData.get("repoUrl") as string;
-  const tags = formData.get("tags") as string; // ej: "React, Node.js"
+  const tags = formData.get("tags") as string;
   const published = formData.get("published") === "on";
 
-  // Convertir tags separados por coma a un JSON array string
   const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
 
   await prisma.project.create({
@@ -78,6 +80,8 @@ export async function createProject(formData: FormData) {
 }
 
 export async function deleteProject(id: string) {
+  await verifyAuth();
+
   await prisma.project.delete({ where: { id } });
   revalidatePath("/admin/dashboard/projects");
   revalidatePath("/");
@@ -85,12 +89,13 @@ export async function deleteProject(id: string) {
 
 // --- BLOG ---
 export async function createPost(formData: FormData) {
+  await verifyAuth();
+
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
   const type = formData.get("type") as string;
   const published = formData.get("published") === "on";
   
-  // Generar un slug simple basado en el título y timestamp
   const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
   const slug = `${baseSlug}-${Date.now()}`;
 
@@ -110,6 +115,8 @@ export async function createPost(formData: FormData) {
 }
 
 export async function deletePost(id: string) {
+  await verifyAuth();
+
   await prisma.post.delete({ where: { id } });
   revalidatePath("/admin/dashboard/blog");
   revalidatePath("/");

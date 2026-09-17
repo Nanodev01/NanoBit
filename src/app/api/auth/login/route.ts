@@ -26,9 +26,15 @@ export async function POST(request: Request) {
     }
 
     // Generar JWT
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('CRITICAL: JWT_SECRET is not defined');
+      return NextResponse.json({ error: 'Error de configuración del servidor' }, { status: 500 });
+    }
+
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'fallback_secret',
+      jwtSecret,
       { expiresIn: '8h' }
     );
 
