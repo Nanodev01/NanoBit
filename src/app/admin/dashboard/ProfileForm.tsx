@@ -32,7 +32,12 @@ export function ProfileForm({ initialProfile }: { initialProfile?: ProfileData |
         setTimeout(() => setSuccess(false), 4000);
       }
     } catch (err: any) {
-      setErrorMsg(err?.message || "Error inesperado al conectar con el servidor.");
+      const msg = err?.message || "";
+      if (msg.includes("Server Action") || msg.includes("not found on the server")) {
+        window.location.reload();
+        return;
+      }
+      setErrorMsg(msg || "Error inesperado al conectar con el servidor.");
     } finally {
       setLoading(false);
     }

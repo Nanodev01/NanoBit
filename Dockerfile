@@ -38,21 +38,21 @@ RUN adduser --system --uid 1001 nextjs
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Copy prisma schema, client and CLI for auto-migrations on boot
+# Automatically leverage output traces to reduce image size
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
+# Copy prisma schema, client and CLI (placed after standalone so they are never overwritten)
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
 
-# Automatically leverage output traces to reduce image size
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
-
 # Copy dependencies needed for standalone scripts (seed, etc)
 COPY --from=builder /app/node_modules/bcryptjs ./node_modules/bcryptjs
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "chmod 777 ./prisma 2>/dev/null || true; npx prisma db push --accept-data-loss && (if [ -n \"$ADMIN_PASSWORD\" ]; then node prisma/seed.js || true; fi) && node server.js"]
+CMD ["sh", "-c", "chmod 777 ./prisma 2>/dev/null || true; npx prisma generate && npx prisma db push --accept-data-loss && (if [ -n \"$ADMIN_PASSWORD\" ]; then node prisma/seed.js || true; fi) && node server.js"]
